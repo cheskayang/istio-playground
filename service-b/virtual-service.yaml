@@ -1,0 +1,43 @@
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: service-b-destination
+  namespace: cheska
+spec:
+  host: service-b
+  subsets:
+    - name: v1
+      labels:
+        version: v1
+    - name: v2
+      labels:
+        version: v2
+---
+
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: service-b-vs
+  namespace: cheska
+spec:
+  hosts:
+    - service-b
+  http:
+    - route:
+      - destination:
+          host: service-b
+          subset: v2
+        weight: 80
+      - destination:
+          host: service-b
+          subset: v1
+        weight: 20
+      retries:
+        attempts: 3
+        perTryTimeout: 1s
+        retryOn: "gateway-error,5xx,retriable-status-codes"
+      # fault:
+      #   delay:
+      #     percentage:
+      #       value: 33
+      #     fixedDelay: 3s

@@ -1,0 +1,43 @@
+
+
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: service-a-vs
+  namespace: default
+spec:
+  hosts:
+    - "*"
+  gateways:
+    - api
+  http:
+    # any routes to deny access to
+    - name: "service-a-routes"
+      match:
+        - uri:
+            # the one with forward slash suffix comes first
+            prefix: "/service-a/"
+        - uri:
+            # the one without it comes after
+            prefix: "/service-a"
+      rewrite:
+        uri: "/"
+      headers:
+        response:
+          remove:
+            - "x-envoy-upstream-service-time"
+      route:
+        - destination:
+            host: service-a.cheska.svc.cluster.local
+            port:
+              number: 80
+
+---
+
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: service-a-destination
+spec:
+  host: service-a.cheska.svc.cluster.local
+
