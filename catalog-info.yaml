@@ -1,0 +1,10 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: istio-playground
+  annotations:
+    github.com/project-slug: cheskayang/istio-playground
+spec:
+  type: other
+  lifecycle: unknown
+  owner: cheskayang
